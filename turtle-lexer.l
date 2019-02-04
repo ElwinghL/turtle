@@ -9,7 +9,24 @@
 
 %option warn 8bit nodefault noyywrap
 
-DIGIT [0-9]
+COMMENT
+DIGIT       0|[1-9]?[0-9]*
+EXPONENT    [eE]([+-])?{DIGIT}+
+FLOAT       {DIGIT}("."{DIGIT}*({EXPONENT})?|{EXPONENT})
+
+CRED        "RED"|"red"
+CGREEN      "GREEN"|"green"
+CBLUE       "BLUE"|"blue"
+CBLACK      "BLACK"|"black"
+CGRAY       "GRAY"|"gray"
+CCYAN       "CYAN"|"cyan"
+CYELLOW     "YELLOW"|"yellow"
+CMAGENTA    "MAGENTA"|"magenta"
+COLORS      {FLOAT}[ ]{FLOAT}[ ]{FLOAT}|CRED|CGREEN|CBLUE|CBLACK|CGRAY|CCYAN|CYELLOW|CMAGENTA
+
+ANGLE       {FLOAT}
+
+
 
 %%
 
