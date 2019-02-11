@@ -60,6 +60,11 @@ struct ast_node {
   size_t children_count;  // the number of children of the node
   struct ast_node *children[AST_CHILDREN_MAX];  // the children of the node (arguments of commands, etc)
   struct ast_node *next;  // the next node in the sequence
+  struct ast_node *make_cmd_forward(struct ast_node *expr);
+  struct ast_node *make_cmd_backward(struct ast_node *expr);
+  struct ast_node *make_cmd_position(struct ast_node *abscisse, struct ast_node *ordonee);
+  struct ast_node *make_cmd_right(struct ast_node *expr);
+  struct ast_node *make_cmd_left(struct ast_node *expr);
 };
 
 

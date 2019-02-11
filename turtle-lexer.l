@@ -9,10 +9,11 @@
 
 %option warn 8bit nodefault noyywrap
 
-COMMENT
+COMMENT		"#".*"\n"
 DIGIT       0|[1-9]?[0-9]*
 EXPONENT    [eE]([+-])?{DIGIT}+
-FLOAT       {DIGIT}("."{DIGIT}*({EXPONENT})?|{EXPONENT})
+FLOAT       {DIGIT}*("."{DIGIT}*({EXPONENT})?|{EXPONENT})
+ANGLE		([0-9]|[1-9][0-9]|[1-3][0-5][0-9]|360)
 
 CRED        "RED"|"red"
 CGREEN      "GREEN"|"green"
@@ -22,17 +23,40 @@ CGRAY       "GRAY"|"gray"
 CCYAN       "CYAN"|"cyan"
 CYELLOW     "YELLOW"|"yellow"
 CMAGENTA    "MAGENTA"|"magenta"
-COLORS      {FLOAT}[ ]{FLOAT}[ ]{FLOAT}|CRED|CGREEN|CBLUE|CBLACK|CGRAY|CCYAN|CYELLOW|CMAGENTA
+COLORS      {FLOAT}[ ]+{FLOAT}[ ]+{FLOAT}|CRED|CGREEN|CBLUE|CBLACK|CGRAY|CCYAN|CYELLOW|CMAGENTA
 
-ANGLE       {FLOAT}
-
+FW			"forward" | fw
+BW			"backward" | bw
+POS			"position" | pos
+RT			"right" | rt
+LT			"left" | lt
+HD			"heading" | hd
 
 
 %%
 
-{DIGIT}+              { yylval.value = strtod(yytext, NULL); return VALUE; }
+{COMMENT}	/* nothing */
+{FLOAT}		{ yylval.value = strtod(yytext, NULL); 
+			printf("%i", yytext);
+			return VALUE; 
+			}
+{ANGLE}	{ yylval.value = strtod(yytext, NULL); 
+			printf("%i", yytext);
+			return ANGLE; }
 
-[\n\t ]*              /* whitespace */
-.                     { fprintf(stderr, "Unknown token: '%s'\n", yytext); exit(EXIT_FAILURE); }
+{COLOR}	{ return CL_COLOR}
+
+{FW}	{ return KW_FORWARD; }
+{BW}	{ return KW_BACKWARD; }
+{POS}	{ return KW_POSITION; }
+{RT}	{ return KW_RIGHT; }
+{LT}	{ return KW_LEFT; }
+{HD}	{ return KW_HEAD; }
+"up"	{ return KW_UP; }
+
+
+[\n\t ]*    /* whitespace */
+.           { fprintf(stderr, "Unknown token: '%s'\n", yytext); 
+			exit(EXIT_FAILURE); }
 
 %%
