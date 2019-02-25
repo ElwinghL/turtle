@@ -25,12 +25,12 @@ CYELLOW     "YELLOW"|"yellow"
 CMAGENTA    "MAGENTA"|"magenta"
 COLORS      {FLOAT}[ ]+{FLOAT}[ ]+{FLOAT}|CRED|CGREEN|CBLUE|CBLACK|CGRAY|CCYAN|CYELLOW|CMAGENTA
 
-FW			"forward" | fw
-BW			"backward" | bw
-POS			"position" | pos
-RT			"right" | rt
-LT			"left" | lt
-HD			"heading" | hd
+FW			"forward"|"fw"
+BW			"backward"|"bw"
+POS			"position"|"pos"
+RT			"right"|"rt"
+LT			"left"|"lt"
+HD			"heading"|"hd"
 
 
 %%
@@ -40,19 +40,19 @@ HD			"heading" | hd
 			printf("%i", yytext);
 			return VALUE; 
 			}
-{ANGLE}	{ yylval.value = strtod(yytext, NULL); 
+{ANGLE}	    { yylval.value = strtod(yytext, NULL);
 			printf("%i", yytext);
 			return ANGLE; }
 
-{COLOR}	{ return CL_COLOR}
+{COLORS}	{ return CL_COLOR;}
 
-{FW}	{ return KW_FORWARD; }
-{BW}	{ return KW_BACKWARD; }
-{POS}	{ return KW_POSITION; }
-{RT}	{ return KW_RIGHT; }
-{LT}	{ return KW_LEFT; }
-{HD}	{ return KW_HEAD; }
-"up"	{ return KW_UP; }
+{FW}	    { return KW_FORWARD; }
+{BW}	    { return KW_BACKWARD; }
+{POS}	    { return KW_POSITION; }
+{RT}	    { return KW_RIGHT; }
+{LT}	    { return KW_LEFT; }
+{HD}	    { return KW_HEAD; }
+"up"	    { return KW_UP; }
 
 
 [\n\t ]*    /* whitespace */

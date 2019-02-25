@@ -65,6 +65,8 @@ struct ast_node {
   struct ast_node *make_cmd_position(struct ast_node *abscisse, struct ast_node *ordonee);
   struct ast_node *make_cmd_right(struct ast_node *expr);
   struct ast_node *make_cmd_left(struct ast_node *expr);
+  struct ast_node *make_cmd_heading(struct ast_node *expr);
+
 };
 
 
