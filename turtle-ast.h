@@ -47,27 +47,31 @@ enum ast_kind {
 
 // a node in the abstract syntax tree
 struct ast_node {
-  enum ast_kind kind; // kind of the node
+    enum ast_kind kind; // kind of the node
 
-  union {
-    enum ast_cmd cmd;   // kind == KIND_CMD_SIMPLE
-    double value;       // kind == KIND_EXPR_VALUE, for literals
-    char op;            // kind == KIND_EXPR_BINOP, for operators in expressions
-    const char *name;   // kind == KIND_EXPR_NAME, the name of procedures and variables
-    enum ast_func func; // kind == KIND_EXPR_FUNC, a function
-  } u;
+    union {
+        enum ast_cmd cmd;   // kind == KIND_CMD_SIMPLE
+        double value;       // kind == KIND_EXPR_VALUE, for literals
+        char op;            // kind == KIND_EXPR_BINOP, for operators in expressions
+        const char *name;   // kind == KIND_EXPR_NAME, the name of procedures and variables
+        enum ast_func func; // kind == KIND_EXPR_FUNC, a function
+    } u;
 
-  size_t children_count;  // the number of children of the node
-  struct ast_node *children[AST_CHILDREN_MAX];  // the children of the node (arguments of commands, etc)
-  struct ast_node *next;  // the next node in the sequence
+    size_t children_count;  // the number of children of the node
+    struct ast_node *children[AST_CHILDREN_MAX];  // the children of the node (arguments of commands, etc)
+    struct ast_node *next;  // the next node in the sequence
+};
+
   struct ast_node *make_cmd_forward(struct ast_node *expr);
   struct ast_node *make_cmd_backward(struct ast_node *expr);
   struct ast_node *make_cmd_position(struct ast_node *abscisse, struct ast_node *ordonee);
   struct ast_node *make_cmd_right(struct ast_node *expr);
   struct ast_node *make_cmd_left(struct ast_node *expr);
   struct ast_node *make_cmd_heading(struct ast_node *expr);
+  struct ast_node *make_cmd_up();
+  struct ast_node *make_cmd_down();
 
-};
+
 
 
 // TODO: make some constructors to use in parser.y
@@ -102,5 +106,7 @@ void ast_print(const struct ast *self);
 
 // evaluate the tree and generate some basic primitives
 void ast_eval(const struct ast *self, struct context *ctx);
+// evaluate an expression
+double ast_expr_eval(const struct ast_node *expr);
 
 #endif /* TURTLE_AST_H */

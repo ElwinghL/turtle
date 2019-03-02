@@ -31,18 +31,20 @@ POS			"position"|"pos"
 RT			"right"|"rt"
 LT			"left"|"lt"
 HD			"heading"|"hd"
+UP          "up"
+DW          "down"|"dw"
 
 
 %%
 
 {COMMENT}	/* nothing */
 {FLOAT}		{ yylval.value = strtod(yytext, NULL); 
-			printf("%i", yytext);
+			printf("%f",atof(yytext));
 			return VALUE; 
 			}
 {ANGLE}	    { yylval.value = strtod(yytext, NULL);
-			printf("%i", yytext);
-			return ANGLE; }
+			printf("%f", atof(yytext));
+			return VALUE; }
 
 {COLORS}	{ return CL_COLOR;}
 
@@ -52,7 +54,8 @@ HD			"heading"|"hd"
 {RT}	    { return KW_RIGHT; }
 {LT}	    { return KW_LEFT; }
 {HD}	    { return KW_HEAD; }
-"up"	    { return KW_UP; }
+{UP}	    { return KW_UP; }
+{DW}        { return KW_DOWN; }
 
 
 [\n\t ]*    /* whitespace */
