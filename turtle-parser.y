@@ -23,7 +23,7 @@ void yyerror(struct ast *ret, const char *);
 
 %token <value>		VALUE       "value"
 %token <name>		NAME        "name"
-%token              CL_COLOR
+%token              CL_COLOR    "colors"
 %token 				KW_FORWARD  "forward"
 %token				KW_BACKWARD	"backward"
 %token				KW_POSITION	"position"	
@@ -56,6 +56,7 @@ cmd:
   | KW_HEAD expr            { $$ = make_cmd_heading($2); }
   | KW_UP                   { $$ = make_cmd_up(); }
   | KW_DOWN                 { $$ = make_cmd_down(); }
+  | CL_COLOR expr expr expr { $$ = make_cmd_colors($2,$3,$4); }
 ;
 
 expr:

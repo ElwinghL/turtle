@@ -70,6 +70,7 @@ struct ast_node {
   struct ast_node *make_cmd_heading(struct ast_node *expr);
   struct ast_node *make_cmd_up();
   struct ast_node *make_cmd_down();
+  struct ast_node *make_cmd_colors(struct ast_node *color0, struct ast_node *color1, struct ast_node *color2);
 
 
 
@@ -106,6 +107,7 @@ void ast_print(const struct ast *self);
 
 // evaluate the tree and generate some basic primitives
 void ast_eval(const struct ast *self, struct context *ctx);
+void ast_eval_r(const struct ast_node *self, struct context *ctx);
 // evaluate an expression
 double ast_expr_eval(const struct ast_node *expr);
 

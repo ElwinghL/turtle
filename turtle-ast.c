@@ -85,6 +85,16 @@ struct ast_node *make_cmd_down(){
     node->children_count = 0;
     return node;
 }
+struct ast_node *make_cmd_colors(struct ast_node *color0, struct ast_node *color1, struct ast_node *color2){
+    struct ast_node *node = calloc(1, sizeof(struct ast_node));
+    node->kind = KIND_CMD_SIMPLE;
+    node->u.cmd = CMD_COLOR;
+    node->children_count = 3;
+    node->children[0] = color0;
+    node->children[1] = color1;
+    node->children[2] = color2;
+    return node;
+}
 
 void ast_destroy(struct ast *self) {
   if (self->unit) {
@@ -100,7 +110,7 @@ void context_create(struct context *self) {
     self->up = false;
     self->x = 0;
     self->y = 0;
-    self->angle = 0;
+    self->angle = 90;
 }
 
 /*
@@ -131,24 +141,46 @@ void ast_eval(const struct ast *self, struct context *ctx) {
                 case CMD_FORWARD:
                     if(ctx->up) {
                         double val = ast_expr_eval(self->unit->children[0]);
-                        ctx->x += val * cos(ctx->angle);
-                        ctx->y += val * sin(ctx->angle);
+                        ctx->x += val * cos(ctx->angle * PI / 180);
+                        ctx->y += val * sin(ctx->angle * PI / 180);
                         printf("MoveTo %f %f\n",ctx->x,ctx->y);
                     } else {
                         double val = ast_expr_eval(self->unit->children[0]);
-                        ctx->x += val * cos(ctx->angle);
-                        ctx->y += val * sin(ctx->angle);
+                        ctx->x += val * cos(ctx->angle * PI / 180);
+                        ctx->y += val * sin(ctx->angle * PI / 180);
                         printf("LineTo %f %f\n",ctx->x,ctx->y);
                     }
                     break;
-                case CMD_BACKWARD:break;
+                case CMD_BACKWARD:
+                    if(ctx->up) {
+                        double val = ast_expr_eval(self->unit->children[0]);
+                        ctx->x -= val * cos(ctx->angle * PI / 180);
+                        ctx->y -= val * sin(ctx->angle * PI / 180);
+                        printf("MoveTo %f %f\n",ctx->x,ctx->y);
+                    } else {
+                        double val = ast_expr_eval(self->unit->children[0]);
+                        ctx->x -= val * cos(ctx->angle * PI / 180);
+                        ctx->y -= val * sin(ctx->angle * PI / 180);
+                        printf("LineTo %f %f\n",ctx->x,ctx->y);
+                    }
+                    break;
                 case CMD_POSITION:
                     ctx->x = ast_expr_eval(self->unit->children[0]);
                     ctx->y = ast_expr_eval(self->unit->children[1]);
                     printf("MoveTo %f %f\n",ctx->x,ctx->y);
                     break;
-                case CMD_HOME:break;
-                case CMD_COLOR:break;
+                case CMD_HOME:
+                    ctx->x = 0;
+                    ctx->y = 0;
+                    printf("MoveTo %f %f\n",ctx->x,ctx->y);
+                    break;
+                case CMD_COLOR:
+                    printf("Color");
+                    for (int i = 0; i < 3; ++i) {
+                        printf(" %f",ast_expr_eval(self->unit->children[i]));
+                    }
+                    printf("\n");
+                    break;
                 case CMD_PRINT:break;
             }
             break;
@@ -166,11 +198,95 @@ void ast_eval(const struct ast *self, struct context *ctx) {
         case KIND_EXPR_NAME:break;
     }
     if (self->unit->next) {
-        printf("All good ?\n");
-        ast_eval((const struct ast *) self->unit->next, ctx);
-        printf("Here ?\n");
+        ast_eval_r(self->unit->next, ctx);
     }
 }
+
+void ast_eval_r(const struct ast_node *self, struct context *ctx) {
+    switch (self->kind) {
+        case KIND_CMD_SIMPLE:
+            switch (self->u.cmd) {
+                case CMD_UP:
+                    ctx->up = true;
+                    //printf("UP\n");
+                    break;
+                case CMD_DOWN:
+                    ctx->up = false;
+                    //printf("DOWN\n");
+                    break;
+                case CMD_RIGHT:
+                    ctx->angle += ast_expr_eval(self->children[0]);
+                    break;
+                case CMD_LEFT:
+                    ctx->angle -= ast_expr_eval(self->children[0]);
+                    break;
+                case CMD_HEADING:
+                    ctx->angle = ast_expr_eval(self->children[0]);
+                    break;
+                case CMD_FORWARD:
+                    if(ctx->up) {
+                        double val = ast_expr_eval(self->children[0]);
+                        ctx->x += val * cos(ctx->angle * PI / 180);
+                        ctx->y += val * sin(ctx->angle * PI / 180);
+                        printf("MoveTo %f %f\n",ctx->x,ctx->y);
+                    } else {
+                        double val = ast_expr_eval(self->children[0]);
+                        ctx->x += val * cos(ctx->angle * PI / 180);
+                        ctx->y += val * sin(ctx->angle * PI / 180);
+                        printf("LineTo %f %f\n",ctx->x,ctx->y);
+                    }
+                    break;
+                case CMD_BACKWARD:
+                    if(ctx->up) {
+                        double val = ast_expr_eval(self->children[0]);
+                        ctx->x -= val * cos(ctx->angle * PI / 180);
+                        ctx->y -= val * sin(ctx->angle * PI / 180);
+                        printf("MoveTo %f %f\n",ctx->x,ctx->y);
+                    } else {
+                        double val = ast_expr_eval(self->children[0]);
+                        ctx->x -= val * cos(ctx->angle * PI / 180);
+                        ctx->y -= val * sin(ctx->angle * PI / 180);
+                        printf("LineTo %f %f\n",ctx->x,ctx->y);
+                    }
+                    break;
+                case CMD_POSITION:
+                    ctx->x = ast_expr_eval(self->children[0]);
+                    ctx->y = ast_expr_eval(self->children[1]);
+                    printf("MoveTo %f %f\n",ctx->x,ctx->y);
+                    break;
+                case CMD_HOME:
+                    ctx->x = 0;
+                    ctx->y = 0;
+                    printf("MoveTo %f %f\n",ctx->x,ctx->y);
+                    break;
+                case CMD_COLOR:
+                    printf("Color");
+                    for (int i = 0; i < 3; ++i) {
+                        printf(" %f",ast_expr_eval(self->children[i]));
+                    }
+                    printf("\n");
+                    break;
+                case CMD_PRINT:break;
+            }
+            break;
+        case KIND_EXPR_VALUE:
+            break;
+        case KIND_EXPR_BLOCK:
+            break;
+        case KIND_CMD_REPEAT:break;
+        case KIND_CMD_BLOCK:break;
+        case KIND_CMD_PROC:break;
+        case KIND_CMD_CALL:break;
+        case KIND_CMD_SET:break;
+        case KIND_EXPR_FUNC:break;
+        case KIND_EXPR_BINOP:break;
+        case KIND_EXPR_NAME:break;
+    }
+    if (self->next) {
+        ast_eval_r(self->next, ctx);
+    }
+}
+
 
 double ast_expr_eval(const struct ast_node *expr) {
     return expr->u.value;

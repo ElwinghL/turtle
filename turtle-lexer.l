@@ -15,15 +15,7 @@ EXPONENT    [eE]([+-])?{DIGIT}+
 FLOAT       {DIGIT}*("."{DIGIT}*({EXPONENT})?|{EXPONENT})
 ANGLE		([0-9]|[1-9][0-9]|[1-3][0-5][0-9]|360)
 
-CRED        "RED"|"red"
-CGREEN      "GREEN"|"green"
-CBLUE       "BLUE"|"blue"
-CBLACK      "BLACK"|"black"
-CGRAY       "GRAY"|"gray"
-CCYAN       "CYAN"|"cyan"
-CYELLOW     "YELLOW"|"yellow"
-CMAGENTA    "MAGENTA"|"magenta"
-COLORS      {FLOAT}[ ]+{FLOAT}[ ]+{FLOAT}|CRED|CGREEN|CBLUE|CBLACK|CGRAY|CCYAN|CYELLOW|CMAGENTA
+COLORS      "color"
 
 FW			"forward"|"fw"
 BW			"backward"|"bw"
@@ -39,11 +31,11 @@ DW          "down"|"dw"
 
 {COMMENT}	/* nothing */
 {FLOAT}		{ yylval.value = strtod(yytext, NULL); 
-			printf("%f",atof(yytext));
+			//printf("%f",atof(yytext));
 			return VALUE; 
 			}
 {ANGLE}	    { yylval.value = strtod(yytext, NULL);
-			printf("%f", atof(yytext));
+			//printf("%f", atof(yytext));
 			return VALUE; }
 
 {COLORS}	{ return CL_COLOR;}
