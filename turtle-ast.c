@@ -96,11 +96,34 @@ struct ast_node *make_cmd_colors(struct ast_node *color0, struct ast_node *color
     return node;
 }
 
+void ast_destroy_r(struct ast_node *self) {
+    if (self) {
+        if (self->next) {
+            ast_destroy_r(self->next);
+            for (int i = 0; i < 3; ++i) {
+                if (self->children[i]) {
+                    ast_destroy_r(self->children[i]);
+                }
+            }
+        }
+        free(self);
+    }
+}
+
 void ast_destroy(struct ast *self) {
   if (self->unit) {
+      if (self->unit->next) {
+          ast_destroy_r(self->unit->next);
+          for (int i = 0; i < 3; ++i) {
+              if (self->unit->children[i]) {
+                  ast_destroy_r(self->unit->children[i]);
+              }
+          }
+      }
       free(self->unit);
   }
 }
+
 
 /*
  * context
@@ -110,7 +133,7 @@ void context_create(struct context *self) {
     self->up = false;
     self->x = 0;
     self->y = 0;
-    self->angle = 90;
+    self->angle = -90;
 }
 
 /*
@@ -136,7 +159,7 @@ void ast_eval(const struct ast *self, struct context *ctx) {
                     ctx->angle -= ast_expr_eval(self->unit->children[0]);
                     break;
                 case CMD_HEADING:
-                    ctx->angle = ast_expr_eval(self->unit->children[0]);
+                    ctx->angle = -90 + ast_expr_eval(self->unit->children[0]);
                     break;
                 case CMD_FORWARD:
                     if(ctx->up) {
